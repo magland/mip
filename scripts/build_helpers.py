@@ -134,15 +134,16 @@ def collect_exposed_symbols_multiple_paths(package_dirs, base_paths):
     return sorted(symbols)
 
 
-def create_mip_json(mip_json_path, package_name=None, dependencies=None, exposed_symbols=None):
+def create_mip_json(mip_json_path, package_name=None, dependencies=None, exposed_symbols=None, version=None):
     """
-    Create a mip.json file with package name, dependencies and exposed_symbols.
+    Create a mip.json file with package name, dependencies, exposed_symbols and version.
     
     Args:
         mip_json_path: Path where the mip.json file should be created
         package_name: Name of the package (default: None)
         dependencies: List of package dependencies (default: [])
         exposed_symbols: List of exposed symbol paths (default: [])
+        version: Version of the package (default: None)
     """
     if dependencies is None:
         dependencies = []
@@ -157,6 +158,10 @@ def create_mip_json(mip_json_path, package_name=None, dependencies=None, exposed
     # Add package name if provided
     if package_name is not None:
         mip_config["package"] = package_name
+    
+    # Add version if provided
+    if version is not None:
+        mip_config["version"] = version
     
     with open(mip_json_path, 'w') as f:
         json.dump(mip_config, f, indent=2)

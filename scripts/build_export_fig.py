@@ -50,10 +50,10 @@ def main():
             f.write(f"export_fig_path = fullfile(fileparts(mfilename('fullpath')), 'export_fig-{version}');\n")
             f.write("addpath(export_fig_path);\n")
         
-        # Create mip.json with package name, dependencies and exposed_symbols
+        # Create mip.json with package name, dependencies, exposed_symbols and version
         mip_json_path = os.path.join(mhl_build_dir, "mip.json")
-        print("Creating mip.json with package name, dependencies and exposed_symbols...")
-        create_mip_json(mip_json_path, package_name="export_fig", dependencies=[], exposed_symbols=exposed_symbols)
+        print("Creating mip.json with package name, dependencies, exposed_symbols and version...")
+        create_mip_json(mip_json_path, package_name="export_fig", dependencies=[], exposed_symbols=exposed_symbols, version=version)
         
         # Create the .mhl file (which is a zip file)
         print(f"Creating {output_file}...")

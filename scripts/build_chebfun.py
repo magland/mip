@@ -9,9 +9,10 @@ from build_helpers import collect_exposed_symbols_top_level, create_mip_json
 def main():
     url = "https://github.com/chebfun/chebfun/archive/master.zip"
     download_file = "chebfun_download.zip"
+    version = "latest"
     # Follow Python wheel naming convention: {package}-{version}-{python_tag}-{abi_tag}-{platform_tag}.whl
     # Adapted for MATLAB: {package}-{version}-{matlab_tag}-{abi_tag}-{platform_tag}.mhl
-    output_file = "chebfun-latest-any-none-any.mhl"
+    output_file = f"chebfun-{version}-any-none-any.mhl"
     
     # Download the zip file
     print(f"Downloading {url}...")
@@ -50,10 +51,10 @@ def main():
             f.write("chebfun_path = fullfile(fileparts(mfilename('fullpath')), 'chebfun');\n")
             f.write("addpath(chebfun_path);\n")
         
-        # Create mip.json with package name, dependencies and exposed_symbols
+        # Create mip.json with package name, dependencies, exposed_symbols and version
         mip_json_path = os.path.join(mhl_build_dir, "mip.json")
-        print("Creating mip.json with package name, dependencies and exposed_symbols...")
-        create_mip_json(mip_json_path, package_name="chebfun", dependencies=[], exposed_symbols=exposed_symbols)
+        print("Creating mip.json with package name, dependencies, exposed_symbols and version...")
+        create_mip_json(mip_json_path, package_name="chebfun", dependencies=[], exposed_symbols=exposed_symbols, version=version)
         
         # Create the .mhl file (which is a zip file)
         print(f"Creating {output_file}...")

@@ -9,8 +9,9 @@ from build_helpers import collect_exposed_symbols_multiple_paths, create_mip_jso
 def main():
     repo_url = "https://github.com/danfortunato/surfacefun.git"
     clone_dir = "surfacefun"
+    version = "latest"
     # Follow Python wheel naming convention: {package}-{version}-{matlab_tag}-{abi_tag}-{platform_tag}.mhl
-    output_file = "surfacefun-latest-any-none-any.mhl"
+    output_file = f"surfacefun-{version}-any-none-any.mhl"
     
     # Remove clone directory if it exists
     if os.path.exists(clone_dir):
@@ -65,10 +66,10 @@ def main():
             f.write("    run(setup_file);\n")
             f.write("end\n")
         
-        # Create mip.json with package name, dependencies and exposed_symbols
+        # Create mip.json with package name, dependencies, exposed_symbols and version
         mip_json_path = os.path.join(mhl_build_dir, "mip.json")
-        print("Creating mip.json with package name, dependencies and exposed_symbols...")
-        create_mip_json(mip_json_path, package_name="surfacefun", dependencies=["chebfun"], exposed_symbols=exposed_symbols)
+        print("Creating mip.json with package name, dependencies, exposed_symbols and version...")
+        create_mip_json(mip_json_path, package_name="surfacefun", dependencies=["chebfun"], exposed_symbols=exposed_symbols, version=version)
         
         # Create the .mhl file (which is a zip file)
         print(f"Creating {output_file}...")

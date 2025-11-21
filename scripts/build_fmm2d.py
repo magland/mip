@@ -42,7 +42,9 @@ def collect_exposed_symbols_with_c_files(package_dir):
 def main():
     repo_url = "https://github.com/flatironinstitute/fmm2d.git"
     clone_dir = "fmm2d"
-    output_file = "fmm2d-latest-any-none-any.mhl"
+    version = "latest"
+    # Follow Python wheel naming convention: {package}-{version}-{matlab_tag}-{abi_tag}-{platform_tag}.mhl
+    output_file = f"fmm2d-{version}-any-none-any.mhl"
     
     # Remove clone directory if it exists
     if os.path.exists(clone_dir):
@@ -117,10 +119,10 @@ def main():
             f.write("fmm2d_path = fullfile(fileparts(mfilename('fullpath')), 'fmm2d');\n")
             f.write("addpath(fmm2d_path);\n")
         
-        # Create mip.json with package name and exposed_symbols (no dependencies)
+        # Create mip.json with package name, exposed_symbols and version (no dependencies)
         mip_json_path = os.path.join(mhl_build_dir, "mip.json")
-        print("Creating mip.json with package name and exposed_symbols...")
-        create_mip_json(mip_json_path, package_name="fmm2d", dependencies=[], exposed_symbols=exposed_symbols)
+        print("Creating mip.json with package name, exposed_symbols and version...")
+        create_mip_json(mip_json_path, package_name="fmm2d", dependencies=[], exposed_symbols=exposed_symbols, version=version)
         
         # Create the .mhl file (which is a zip file)
         print(f"Creating {output_file}...")

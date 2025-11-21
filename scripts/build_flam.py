@@ -9,8 +9,9 @@ from build_helpers import collect_exposed_symbols_recursive, create_mip_json
 def main():
     repo_url = "https://github.com/klho/FLAM.git"
     clone_dir = "FLAM"
+    version = "latest"
     # Follow Python wheel naming convention: {package}-{version}-{matlab_tag}-{abi_tag}-{platform_tag}.mhl
-    output_file = "flam-latest-any-none-any.mhl"
+    output_file = f"flam-{version}-any-none-any.mhl"
     
     # Remove clone directory if it exists
     if os.path.exists(clone_dir):
@@ -59,10 +60,10 @@ def main():
             f.write("    run(startup_file);\n")
             f.write("end\n")
         
-        # Create mip.json with package name, dependencies and exposed_symbols
+        # Create mip.json with package name, dependencies, exposed_symbols and version
         mip_json_path = os.path.join(mhl_build_dir, "mip.json")
-        print("Creating mip.json with package name, dependencies and exposed_symbols...")
-        create_mip_json(mip_json_path, package_name="flam", dependencies=[], exposed_symbols=exposed_symbols)
+        print("Creating mip.json with package name, dependencies, exposed_symbols and version...")
+        create_mip_json(mip_json_path, package_name="flam", dependencies=[], exposed_symbols=exposed_symbols, version=version)
         
         # Create the .mhl file (which is a zip file)
         print(f"Creating {output_file}...")

@@ -449,7 +449,7 @@ def uninstall_package(package_name):
 
 
 def list_packages():
-    """List all installed packages"""
+    """List all installed packages with their versions"""
     mip_dir = get_mip_dir()
     
     if not mip_dir.exists():
@@ -463,7 +463,24 @@ def list_packages():
     else:
         print("Installed packages:")
         for package in sorted(packages):
-            print(f"  - {package}")
+            package_dir = mip_dir / package
+            mip_json_path = package_dir / 'mip.json'
+            
+            # Try to read version from mip.json
+            version = None
+            if mip_json_path.exists():
+                try:
+                    with open(mip_json_path, 'r') as f:
+                        mip_config = json.load(f)
+                    version = mip_config.get('version')
+                except Exception:
+                    pass
+            
+            # Display package with version if available
+            if version:
+                print(f"  - {package} (v{version})")
+            else:
+                print(f"  - {package}")
 
 
 def setup_matlab():
