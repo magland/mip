@@ -5,6 +5,7 @@ setup(
     version='0.1.0',
     description='pip-style package manager for MATLAB packages',
     author='Your Name',
+    license='Apache License 2.0',
     packages=find_packages(),
     include_package_data=True,
     package_data={

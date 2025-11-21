@@ -16,6 +16,35 @@ def get_mip_dir():
     home = Path.home()
     return home / '.mip' / 'packages'
 
+def _ensure_mip_matlab_setup():
+    """Ensure the +mip directory is set up in ~/.mip/matlab
+    
+    This is called automatically by install, uninstall, and setup commands
+    to ensure users always have the latest version of mip.import()
+    """
+    try:
+        # Get the source +mip directory
+        source_mip = Path(__file__).parent / '+mip'
+        if not source_mip.exists():
+            print("Warning: +mip directory not found in package")
+            return
+        
+        # Destination path in ~/.mip/matlab/+mip
+        home = Path.home()
+        dest_mip = home / '.mip' / 'matlab' / '+mip'
+        
+        # Create parent directory if it doesn't exist
+        dest_mip.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Copy the +mip directory (remove old one if it exists)
+        if dest_mip.exists():
+            shutil.rmtree(dest_mip)
+        
+        shutil.copytree(source_mip, dest_mip)
+        
+    except Exception as e:
+        print(f"Warning: Failed to update MATLAB integration: {e}")
+
 
 def _build_dependency_graph(package_name, manifest, visited=None, path=None):
     """Recursively build a dependency graph for a package
@@ -107,6 +136,9 @@ def install_package(package_name):
     Args:
         package_name: Name of the package to install
     """
+    # Ensure MATLAB integration is up to date
+    _ensure_mip_matlab_setup()
+    
     mip_dir = get_mip_dir()
     mip_dir.mkdir(parents=True, exist_ok=True)
     
@@ -169,6 +201,9 @@ def install_package(package_name):
 
 def uninstall_package(package_name):
     """Uninstall a package"""
+    # Ensure MATLAB integration is up to date
+    _ensure_mip_matlab_setup()
+    
     mip_dir = get_mip_dir()
     package_dir = mip_dir / package_name
     
@@ -211,61 +246,19 @@ def list_packages():
 
 
 def setup_matlab():
-    """Set up the +mip directory in MATLAB path"""
-    try:
-        # Try to get MATLAB userpath
-        print("Detecting MATLAB userpath...")
-        result = subprocess.run(
-            ['matlab', '-batch', 'disp(userpath)'],
-            capture_output=True,
-            text=True,
-            timeout=30
-        )
-        
-        if result.returncode != 0:
-            print("Error: Could not run MATLAB")
-            print("Make sure MATLAB is installed and available in your PATH")
-            sys.exit(1)
-        
-        # Parse the userpath (remove trailing colon/semicolon if present)
-        userpath = result.stdout.strip().rstrip(':;')
-        
-        if not userpath:
-            print("Error: Could not determine MATLAB userpath")
-            sys.exit(1)
-        
-        print(f"MATLAB userpath: {userpath}")
-        
-        # Get the source +mip directory
-        source_mip = Path(__file__).parent / '+mip'
-        if not source_mip.exists():
-            print("Error: +mip directory not found in package")
-            sys.exit(1)
-        
-        # Destination path
-        dest_mip = Path(userpath) / '+mip'
-        
-        # Create userpath if it doesn't exist
-        Path(userpath).mkdir(parents=True, exist_ok=True)
-        
-        # Copy the +mip directory
-        if dest_mip.exists():
-            print(f"Removing existing +mip directory at {dest_mip}...")
-            shutil.rmtree(dest_mip)
-        
-        print(f"Copying +mip to {dest_mip}...")
-        shutil.copytree(source_mip, dest_mip)
-        
-        print(f"Successfully set up mip in MATLAB!")
-        print(f"You can now use 'mip.import('[package]')' in MATLAB")
-        
-    except subprocess.TimeoutExpired:
-        print("Error: MATLAB command timed out")
-        sys.exit(1)
-    except FileNotFoundError:
-        print("Error: MATLAB not found")
-        print("Make sure MATLAB is installed and available in your PATH")
-        sys.exit(1)
-    except Exception as e:
-        print(f"Error: Failed to set up MATLAB integration: {e}")
-        sys.exit(1)
+    """Refresh the +mip directory in ~/.mip/matlab
+    
+    This ensures you have the latest version of mip.import() after upgrading mip.
+    The MATLAB integration is also automatically updated when running install or uninstall commands.
+    """
+    # Ensure MATLAB integration is up to date
+    _ensure_mip_matlab_setup()
+    
+    home = Path.home()
+    mip_matlab_dir = home / '.mip' / 'matlab'
+    
+    print(f"MATLAB integration updated at: {mip_matlab_dir}")
+    print(f"\nMake sure to add '{mip_matlab_dir}' to your MATLAB path.")
+    print(f"You can do this by running in MATLAB:")
+    print(f"  addpath('{mip_matlab_dir}')")
+    print(f"  savepath")

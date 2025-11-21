@@ -18,15 +18,22 @@ pip install -e .
 ```
 
 
-## Setup
+## Setup MATLAB Path
 
-After installation, set up MATLAB integration:
+Add `~/.mip/matlab` to your MATLAB path permanently. You can do this in MATLAB:
 
-```bash
-mip setup
+```matlab
+addpath('~/.mip/matlab')
+savepath
 ```
 
-This will copy the `+mip` directory to your MATLAB userpath so you can use `mip.import()` in MATLAB.
+Alternatively, you can add this to your MATLAB `startup.m` file (typically located at `~/Documents/MATLAB/startup.m`):
+
+```matlab
+addpath('~/.mip/matlab')
+```
+
+**Note**: After upgrading to a new version of mip, run `mip setup` to ensure you have the latest MATLAB integration.
 
 ## Usage
 
@@ -36,7 +43,7 @@ This will copy the `+mip` directory to your MATLAB userpath so you can use `mip.
 mip install package_name
 ```
 
-Downloads and installs a package from `https://magland.github.io/mip/package_name.zip` to `~/.mip/packages/package_name`.
+Downloads and installs a package from `https://magland.github.io/mip/package_name-*.mhl` to `~/.mip/packages/package_name`.
 
 ### Uninstall a package
 
@@ -56,7 +63,7 @@ Shows all currently installed packages.
 
 ### Using packages in MATLAB
 
-After running `mip setup` and installing packages, you can import them in MATLAB:
+After setting up the MATLAB path and installing packages, you can import them in MATLAB:
 
 ```matlab
 % Import a package (adds it to the path for the current session)
@@ -69,7 +76,7 @@ mip.import('package_name')
 
 - Packages are stored in `~/.mip/packages/`
 - Each package is extracted from a zip file into its own directory
-- The `+mip` MATLAB namespace is installed in your MATLAB userpath
+- The `+mip` MATLAB namespace is installed in `~/.mip/matlab/+mip/`
 
 ## Examples
 
@@ -94,3 +101,7 @@ mip uninstall surfacefun
 - Python 3.6+
 - MATLAB (for `mip setup` and using packages in MATLAB)
 - requests library (installed automatically)
+
+## License
+
+Apache License 2.0
