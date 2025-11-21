@@ -40,7 +40,7 @@ def main():
     
     # Create zip file
     print(f"Creating {output_file}...")
-    shutil.make_archive(clone_dir, 'zip', '.', clone_dir)
+    shutil.make_archive(clone_dir, 'zip', clone_dir, '.')
     
     # Clean up cloned directory
     print(f"Cleaning up {clone_dir} directory...")
