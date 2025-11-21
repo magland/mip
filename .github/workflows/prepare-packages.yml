@@ -44,6 +44,9 @@ jobs:
       - name: Run build_flam.py
         run: python scripts/build_flam.py
 
+      - name: Run build_kdtree.py
+        run: python scripts/build_kdtree.py
+
       - name: Create deploy directory structure
         run: |
           mkdir -p deploy/packages
@@ -51,6 +54,7 @@ jobs:
           mv export_fig-3.54-any-none-any.mhl deploy/packages/
           mv surfacefun-latest-any-none-any.mhl deploy/packages/
           mv flam-latest-any-none-any.mhl deploy/packages/
+          mv kdtree-latest-any-none-any.mhl deploy/packages/
 
       - name: Generate manifest
         run: python scripts/generate_manifest.py

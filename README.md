@@ -55,6 +55,7 @@ Currently, the supported packages are:
 - [chebfun](https://github.com/chebfun/chebfun)
 - [surfacefun](https://github.com/danfortunato/surfacefun) - depends on chebfun
 - [FLAM](https://github.com/klho/FLAM)
+- [kdtree](https://github.com/taiya/kdtree)
 
 ### Using packages in MATLAB
 
