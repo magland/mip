@@ -5,6 +5,30 @@ Helper functions for building MATLAB package (.mhl) files.
 import os
 import json
 
+def _extract_symbol_name(item_name):
+    """Extract the symbol name from a file or directory name.
+    
+    Examples:
+        'filename.m' → 'filename'
+        '+packagename' → 'packagename'
+        '@classname' → 'classname'
+    
+    Args:
+        item_name: The file or directory name
+    
+    Returns:
+        The extracted symbol name
+    """
+    # Remove .m extension if present
+    if item_name.endswith('.m'):
+        item_name = item_name[:-2]
+    
+    # Remove + or @ prefix if present
+    if item_name.startswith('+') or item_name.startswith('@'):
+        item_name = item_name[1:]
+    
+    return item_name
+
 
 def collect_exposed_symbols_top_level(package_dir, base_path="."):
     """
@@ -33,11 +57,11 @@ def collect_exposed_symbols_top_level(package_dir, base_path="."):
         item_path = os.path.join(package_dir, item)
         
         if item.endswith('.m') and os.path.isfile(item_path):
-            # Add .m file
-            symbols.append(os.path.join(base_path, item))
+            # Add .m file (extract symbol name only)
+            symbols.append(_extract_symbol_name(item))
         elif os.path.isdir(item_path) and (item.startswith('+') or item.startswith('@')):
-            # Add package or class directory
-            symbols.append(os.path.join(base_path, item))
+            # Add package or class directory (extract symbol name only)
+            symbols.append(_extract_symbol_name(item))
     
     return symbols
 
@@ -71,15 +95,15 @@ def collect_exposed_symbols_recursive(package_dir, base_path="."):
         else:
             current_base = os.path.join(base_path, rel_root)
         
-        # Add .m files
+        # Add .m files (extract symbol name only)
         for file in sorted(files):
             if file.endswith('.m'):
-                symbols.append(os.path.join(current_base, file))
+                symbols.append(_extract_symbol_name(file))
         
-        # Add package and class directories
+        # Add package and class directories (extract symbol name only)
         for dir_name in sorted(dirs):
             if dir_name.startswith('+') or dir_name.startswith('@'):
-                symbols.append(os.path.join(current_base, dir_name))
+                symbols.append(_extract_symbol_name(dir_name))
     
     return sorted(symbols)
 

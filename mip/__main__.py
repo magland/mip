@@ -1,23 +1,25 @@
 """CLI entry point for mip"""
 
 import sys
-from .commands import install_package, uninstall_package, list_packages, setup_matlab
+from .commands import install_package, uninstall_package, list_packages, setup_matlab, find_name_collisions
 
 def print_usage():
     """Print usage information"""
     print("Usage: mip <command> [arguments]")
     print()
     print("Commands:")
-    print("  install <package>   Install a package")
-    print("  uninstall <package> Uninstall a package")
-    print("  list                List installed packages")
-    print("  setup               Set up MATLAB integration")
+    print("  install <package>      Install a package")
+    print("  uninstall <package>    Uninstall a package")
+    print("  list                   List installed packages")
+    print("  setup                  Set up MATLAB integration")
+    print("  find-name-collisions   Find symbol name collisions across packages")
     print()
     print("Examples:")
     print("  mip install mypackage")
     print("  mip uninstall mypackage")
     print("  mip list")
     print("  mip setup")
+    print("  mip find-name-collisions")
 
 def main():
     """Main entry point for the CLI"""
@@ -49,11 +51,14 @@ def main():
     elif command == 'setup':
         setup_matlab()
     
+    elif command == 'find-name-collisions':
+        find_name_collisions()
+    
     else:
         print(f"Error: Unknown command '{command}'")
         print()
         print_usage()
         sys.exit(1)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
