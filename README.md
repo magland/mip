@@ -48,7 +48,7 @@ addpath('~/.mip/matlab')
 mip install package_name
 ```
 
-Downloads and installs a package from `https://magland.github.io/mip/package_name-*.mhl` to `~/.mip/packages/package_name`.
+Downloads and installs a package to `~/.mip/packages/package_name`.
 
 Currently, the supported packages are:
 - [export_fig](https://github.com/altmany/export_fig)
@@ -56,6 +56,7 @@ Currently, the supported packages are:
 - [surfacefun](https://github.com/danfortunato/surfacefun) - depends on chebfun
 - [FLAM](https://github.com/klho/FLAM)
 - [kdtree](https://github.com/taiya/kdtree) - however, Linux MEX files are not yet provided
+- [fmm2d](https://github.com/flatironinstitute/fmm2d) - however, only Linux MEX files are currently provided
 
 ### Using packages in MATLAB
 
@@ -82,13 +83,13 @@ Shows all currently installed packages.
 mip uninstall package_name
 ```
 
-Removes an installed package after confirmation.
+Removes an installed package after confirmation. Also removes any packages that depend on it.
 
 ## Internal Package Structure
 
 - Packages are stored in `~/.mip/packages/`
 - Each package is extracted from a zip (.mhl) file into its own directory
-- Each package has a `mip.json` file containing metadata such as dependencies and a `setup.m` that gets called on import
+- Each package has a `mip.json` file containing metadata and a `setup.m` that gets called on import
 - The `+mip` MATLAB namespace is installed in `~/.mip/matlab/+mip/`
 
 ## Example
@@ -111,7 +112,7 @@ mip uninstall surfacefun
 
 ## How to add new packages
 
-For now mip supports a very limited set of packages, which are built as part of this repository and hosted on GitHub Pages. To add a new package, you need to submit a pull request with a new script in `scripts/` and also modify the `.github/workflows/prepare-packages.yml` file to include the new package in the build process. Once your pull request is merged, your package will be automatically built and hosted.
+For now mip supports a very limited set of packages, which are built as part of this repository. To add a new package, you should submit a pull request with a new script in `scripts/` and also modify the `.github/workflows/prepare-packages.yml` file to include the new package in the build process. Once your pull request is merged, your package will be automatically built and hosted.
 
 ## Requirements
 
