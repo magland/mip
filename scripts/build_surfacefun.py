@@ -65,10 +65,10 @@ def main():
             f.write("    run(setup_file);\n")
             f.write("end\n")
         
-        # Create mip.json with dependencies and exposed_symbols
+        # Create mip.json with package name, dependencies and exposed_symbols
         mip_json_path = os.path.join(mhl_build_dir, "mip.json")
-        print("Creating mip.json with dependencies and exposed_symbols...")
-        create_mip_json(mip_json_path, dependencies=["chebfun"], exposed_symbols=exposed_symbols)
+        print("Creating mip.json with package name, dependencies and exposed_symbols...")
+        create_mip_json(mip_json_path, package_name="surfacefun", dependencies=["chebfun"], exposed_symbols=exposed_symbols)
         
         # Create the .mhl file (which is a zip file)
         print(f"Creating {output_file}...")

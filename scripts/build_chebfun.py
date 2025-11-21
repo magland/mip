@@ -50,10 +50,10 @@ def main():
             f.write("chebfun_path = fullfile(fileparts(mfilename('fullpath')), 'chebfun');\n")
             f.write("addpath(chebfun_path);\n")
         
-        # Create mip.json with dependencies and exposed_symbols
+        # Create mip.json with package name, dependencies and exposed_symbols
         mip_json_path = os.path.join(mhl_build_dir, "mip.json")
-        print("Creating mip.json with dependencies and exposed_symbols...")
-        create_mip_json(mip_json_path, dependencies=[], exposed_symbols=exposed_symbols)
+        print("Creating mip.json with package name, dependencies and exposed_symbols...")
+        create_mip_json(mip_json_path, package_name="chebfun", dependencies=[], exposed_symbols=exposed_symbols)
         
         # Create the .mhl file (which is a zip file)
         print(f"Creating {output_file}...")

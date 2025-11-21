@@ -134,17 +134,121 @@ def _download_and_install(package_name, package_info, mip_dir):
     print(f"Successfully installed '{package_name}'")
 
 
-def install_package(package_name):
-    """Install a package from the mip repository
+def _install_from_mhl(mhl_source, mip_dir):
+    """Install a package from a local .mhl file or URL
     
     Args:
-        package_name: Name of the package to install
+        mhl_source: Path to local .mhl file or URL to .mhl file
+        mip_dir: The mip directory path
+    """
+    import tempfile
+    
+    # Create temporary directory for extraction
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_extract_dir = Path(temp_dir) / "extracted"
+        temp_extract_dir.mkdir()
+        
+        # Download or copy the .mhl file
+        if mhl_source.startswith('http://') or mhl_source.startswith('https://'):
+            print(f"Downloading {mhl_source}...")
+            mhl_path = Path(temp_dir) / "package.mhl"
+            try:
+                request.urlretrieve(mhl_source, mhl_path)
+            except (HTTPError, URLError) as e:
+                print(f"Error: Could not download .mhl file: {e}")
+                sys.exit(1)
+        else:
+            # Local file
+            mhl_path = Path(mhl_source)
+            if not mhl_path.exists():
+                print(f"Error: File not found: {mhl_source}")
+                sys.exit(1)
+            if not mhl_path.is_file():
+                print(f"Error: Not a file: {mhl_source}")
+                sys.exit(1)
+        
+        # Extract the .mhl file
+        print(f"Extracting package...")
+        try:
+            with zipfile.ZipFile(mhl_path, 'r') as zip_ref:
+                zip_ref.extractall(temp_extract_dir)
+        except zipfile.BadZipFile:
+            print(f"Error: Invalid .mhl file (not a valid zip file)")
+            sys.exit(1)
+        
+        # Read mip.json to get package name and dependencies
+        mip_json_path = temp_extract_dir / 'mip.json'
+        if not mip_json_path.exists():
+            print(f"Error: Package is missing mip.json file")
+            sys.exit(1)
+        
+        try:
+            with open(mip_json_path, 'r') as f:
+                mip_config = json.load(f)
+        except Exception as e:
+            print(f"Error: Could not read mip.json: {e}")
+            sys.exit(1)
+        
+        # Get package name
+        package_name = mip_config.get('package')
+        if not package_name:
+            print(f"Error: Package name not found in mip.json")
+            print(f"The mip.json file must contain a 'package' field with the package name")
+            sys.exit(1)
+        
+        # Check if package is already installed
+        package_dir = mip_dir / package_name
+        if package_dir.exists():
+            print(f"Package '{package_name}' is already installed")
+            return
+        
+        # Get dependencies
+        dependencies = mip_config.get('dependencies', [])
+        
+        # Install dependencies from remote repository
+        if dependencies:
+            print(f"\nPackage '{package_name}' has dependencies: {', '.join(dependencies)}")
+            print(f"Installing dependencies from remote repository...")
+            for dep in dependencies:
+                # Check if dependency is already installed
+                dep_dir = mip_dir / dep
+                if dep_dir.exists():
+                    print(f"Dependency '{dep}' is already installed")
+                else:
+                    print(f"\nInstalling dependency '{dep}'...")
+                    install_package(dep)
+        
+        # Install the package
+        print(f"\nInstalling '{package_name}'...")
+        package_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Copy all files from temp extraction directory to package directory
+        for item in temp_extract_dir.iterdir():
+            if item.is_file():
+                shutil.copy2(item, package_dir)
+            elif item.is_dir():
+                shutil.copytree(item, package_dir / item.name)
+        
+        print(f"Successfully installed '{package_name}'")
+
+def install_package(package_name):
+    """Install a package from the mip repository, local .mhl file, or URL
+    
+    Args:
+        package_name: Name of the package to install, path to local .mhl file, or URL to .mhl file
     """
     # Ensure MATLAB integration is up to date
     _ensure_mip_matlab_setup()
     
     mip_dir = get_mip_dir()
     mip_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Check if this is a local .mhl file or URL
+    if package_name.endswith('.mhl'):
+        _install_from_mhl(package_name, mip_dir)
+        return
+    
+    # Otherwise, proceed with remote repository installation
     
     # Download and parse the packages.json manifest
     manifest_url = "https://magland.github.io/mip/packages.json"
