@@ -66,7 +66,7 @@ def collect_exposed_symbols_top_level(package_dir, base_path="."):
     return symbols
 
 
-def collect_exposed_symbols_recursive(package_dir, base_path="."):
+def collect_exposed_symbols_recursive(package_dir, base_path=".", exclude_dirs=None):
     """
     Recursively collect exposed symbols from a directory tree.
     
@@ -78,6 +78,7 @@ def collect_exposed_symbols_recursive(package_dir, base_path="."):
     Args:
         package_dir: The root directory to scan recursively
         base_path: The base path to prepend to symbol names (default: ".")
+        exclude_dirs: List of directory names to exclude from scanning (default: None)
     
     Returns:
         List of relative paths to exposed symbols
@@ -87,7 +88,13 @@ def collect_exposed_symbols_recursive(package_dir, base_path="."):
     if not os.path.exists(package_dir):
         return symbols
     
+    if exclude_dirs is None:
+        exclude_dirs = []
+    
     for root, dirs, files in os.walk(package_dir):
+        # Remove excluded directories from the dirs list to prevent os.walk from descending into them
+        dirs[:] = [d for d in dirs if d not in exclude_dirs]
+        
         # Calculate the relative path from package_dir
         rel_root = os.path.relpath(root, package_dir)
         if rel_root == '.':

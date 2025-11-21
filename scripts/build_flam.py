@@ -43,9 +43,9 @@ def main():
         print(f"Moving FLAM to flam...")
         shutil.move(clone_dir, flam_dir)
         
-        # Collect exposed symbols recursively
+        # Collect exposed symbols recursively (excluding test and paper directories)
         print("Collecting exposed symbols...")
-        exposed_symbols = collect_exposed_symbols_recursive(flam_dir, "flam")
+        exposed_symbols = collect_exposed_symbols_recursive(flam_dir, "flam", exclude_dirs=['test', 'paper'])
         
         # Create setup.m file
         setup_m_path = os.path.join(mhl_build_dir, "setup.m")
