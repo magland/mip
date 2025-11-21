@@ -4,6 +4,7 @@ import os
 import zipfile
 import shutil
 import tempfile
+from build_helpers import collect_exposed_symbols_top_level, create_mip_json
 
 def main():
     url = "https://github.com/chebfun/chebfun/archive/master.zip"
@@ -37,6 +38,10 @@ def main():
         print(f"Moving chebfun-master to chebfun...")
         shutil.move(extracted_dir, chebfun_dir)
         
+        # Collect exposed symbols
+        print("Collecting exposed symbols...")
+        exposed_symbols = collect_exposed_symbols_top_level(chebfun_dir, "chebfun")
+        
         # Create setup.m file
         setup_m_path = os.path.join(mhl_build_dir, "setup.m")
         print("Creating setup.m...")
@@ -45,11 +50,19 @@ def main():
             f.write("chebfun_path = fullfile(fileparts(mfilename('fullpath')), 'chebfun');\n")
             f.write("addpath(chebfun_path);\n")
         
+        # Create mip.json with dependencies and exposed_symbols
+        mip_json_path = os.path.join(mhl_build_dir, "mip.json")
+        print("Creating mip.json with dependencies and exposed_symbols...")
+        create_mip_json(mip_json_path, dependencies=[], exposed_symbols=exposed_symbols)
+        
         # Create the .mhl file (which is a zip file)
         print(f"Creating {output_file}...")
         with zipfile.ZipFile(output_file, 'w', zipfile.ZIP_DEFLATED) as mhl_zip:
             # Add setup.m
             mhl_zip.write(setup_m_path, 'setup.m')
+            
+            # Add mip.json
+            mhl_zip.write(mip_json_path, 'mip.json')
             
             # Add all files in the chebfun directory
             for root, dirs, files in os.walk(chebfun_dir):

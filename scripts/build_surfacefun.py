@@ -4,6 +4,7 @@ import shutil
 import os
 import zipfile
 import tempfile
+from build_helpers import collect_exposed_symbols_multiple_paths, create_mip_json
 
 def main():
     repo_url = "https://github.com/danfortunato/surfacefun.git"
@@ -19,7 +20,9 @@ def main():
     # Clone the repository with submodules
     print(f"Cloning {repo_url} with submodules...")
     subprocess.run(
-        ["git", "clone", "--recurse-submodules", repo_url],
+        # We don't need to recursively clone submodules because we are going to use mip to manage the dependency on chebfun
+        # ["git", "clone", "--recurse-submodules", repo_url],
+        ["git", "clone", repo_url],
         check=True
     )
     
@@ -42,6 +45,14 @@ def main():
         print(f"Moving surfacefun...")
         shutil.move(clone_dir, surfacefun_dir)
         
+        # Collect exposed symbols from surfacefun root and tools directory
+        print("Collecting exposed symbols...")
+        tools_dir = os.path.join(surfacefun_dir, "tools")
+        exposed_symbols = collect_exposed_symbols_multiple_paths(
+            [surfacefun_dir, tools_dir],
+            ["surfacefun", "surfacefun/tools"]
+        )
+        
         # Create setup.m file
         setup_m_path = os.path.join(mhl_build_dir, "setup.m")
         print("Creating setup.m...")
@@ -54,15 +65,10 @@ def main():
             f.write("    run(setup_file);\n")
             f.write("end\n")
         
-        # Create mip.json with dependencies
+        # Create mip.json with dependencies and exposed_symbols
         mip_json_path = os.path.join(mhl_build_dir, "mip.json")
-        print("Creating mip.json with dependencies...")
-        import json
-        mip_config = {
-            "dependencies": ["chebfun"]
-        }
-        with open(mip_json_path, 'w') as f:
-            json.dump(mip_config, f, indent=2)
+        print("Creating mip.json with dependencies and exposed_symbols...")
+        create_mip_json(mip_json_path, dependencies=["chebfun"], exposed_symbols=exposed_symbols)
         
         # Create the .mhl file (which is a zip file)
         print(f"Creating {output_file}...")
