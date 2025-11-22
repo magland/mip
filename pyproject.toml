@@ -3,8 +3,8 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mip-client"
-version = "0.1.0"
+name = "mip-package-manager"
+version = "0.1.1"
 description = "pip-style package manager for MATLAB packages"
 readme = "README.md"
 authors = [

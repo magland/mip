@@ -9,15 +9,15 @@ A simple pip-style package manager for MATLAB packages.
 Install the package using pip:
 
 ```bash
-pip install mip-client
+pip install mip-package-manager
 ```
 
 Or install from source:
 
 ```bash
 # First, clone the repository
-git clone https://github.com/mip-org/mip.git
-cd mip
+git clone https://github.com/mip-org/mip-client.git
+cd mip-client
 
 # Then, install the package
 pip install -e .
