@@ -3,12 +3,13 @@
 import sys
 from .package_info import _read_package_dependencies
 
-def _build_dependency_graph(package_name, index, visited=None, path=None):
+def _build_dependency_graph(package_name, package_info_source, visited=None, path=None):
     """Recursively build a dependency graph for a package
     
     Args:
         package_name: Name of the package
-        index: The parsed package index
+        package_info_source: Either the parsed package index (dict with 'packages' key)
+                            or a package_info_map (dict mapping names to package info)
         visited: Set of already visited packages (for cycle detection)
         path: Current path (for cycle detection)
     
@@ -30,12 +31,17 @@ def _build_dependency_graph(package_name, index, visited=None, path=None):
     if package_name in visited:
         return []
 
-    # Find package in index
+    # Find package info - support both index format and package_info_map format
     package_info = None
-    for pkg in index.get('packages', []):
-        if pkg.get('name') == package_name:
-            package_info = pkg
-            break
+    if 'packages' in package_info_source:
+        # Old format: index with 'packages' list
+        for pkg in package_info_source.get('packages', []):
+            if pkg.get('name') == package_name:
+                package_info = pkg
+                break
+    else:
+        # New format: package_info_map (dict mapping names to info)
+        package_info = package_info_source.get(package_name)
     
     if not package_info:
         print(f"Error: Package '{package_name}' not found in repository")
@@ -47,7 +53,7 @@ def _build_dependency_graph(package_name, index, visited=None, path=None):
     # Collect all dependencies first
     result = []
     for dep in package_info.get('dependencies', []):
-        result.extend(_build_dependency_graph(dep, index, visited, path[:]))
+        result.extend(_build_dependency_graph(dep, package_info_source, visited, path[:]))
 
     # Then add this package
     result.append(package_name)

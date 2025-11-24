@@ -12,6 +12,11 @@ from urllib.error import URLError, HTTPError
 from .utils import get_mip_dir
 from .matlab_integration import _ensure_mip_matlab_setup
 from .dependency_graph import _build_dependency_graph, _topological_sort_packages
+from .platform_utils import (
+    get_current_platform_tag,
+    select_best_package_variant,
+    get_available_platforms_for_package
+)
 
 def _download_and_install(package_name, package_info, mip_dir):
     """Download and install a single package
@@ -180,7 +185,43 @@ def install_package(package_names):
                 index_content = response.read().decode('utf-8')
             
             index = json.loads(index_content)
-            package_info_map = {pkg['name']: pkg for pkg in index.get('packages', [])}
+            
+            # Get current platform and filter packages by compatibility
+            current_platform = get_current_platform_tag()
+            print(f"Detected platform: {current_platform}")
+            
+            # Group packages by name to handle multiple platform variants
+            packages_by_name = {}
+            for pkg in index.get('packages', []):
+                name = pkg['name']
+                if name not in packages_by_name:
+                    packages_by_name[name] = []
+                packages_by_name[name].append(pkg)
+            
+            # Select best variant for each package
+            package_info_map = {}
+            unavailable_packages = {}
+            
+            for name, variants in packages_by_name.items():
+                best_variant = select_best_package_variant(variants, current_platform)
+                if best_variant:
+                    package_info_map[name] = best_variant
+                else:
+                    # Track packages with no compatible variant
+                    unavailable_packages[name] = get_available_platforms_for_package(variants)
+            
+            # Check if any requested packages are unavailable for this platform
+            for pkg_name in repo_packages:
+                if pkg_name not in package_info_map:
+                    if pkg_name in unavailable_packages:
+                        available_platforms = unavailable_packages[pkg_name]
+                        print(f"\nError: Package '{pkg_name}' is not available for platform '{current_platform}'")
+                        print(f"Available platforms: {', '.join(available_platforms)}")
+                        sys.exit(1)
+                    else:
+                        # Package doesn't exist at all
+                        print(f"Error: Package '{pkg_name}' not found in repository")
+                        sys.exit(1)
             
             # Resolve dependencies for all requested packages
             if len(repo_packages) == 1:
@@ -188,10 +229,10 @@ def install_package(package_names):
             else:
                 print(f"Resolving dependencies for {len(repo_packages)} packages...")
             
-            # Build combined dependency graph
+            # Build combined dependency graph using the filtered package_info_map
             all_required = set()
             for pkg_name in repo_packages:
-                install_order = _build_dependency_graph(pkg_name, index)
+                install_order = _build_dependency_graph(pkg_name, package_info_map)
                 all_required.update(install_order)
             
             # Convert to list and sort topologically
@@ -245,7 +286,7 @@ def install_package(package_names):
             required_by = []
             for requested in repo_packages:
                 if requested != pkg_name:
-                    deps = _build_dependency_graph(requested, index)
+                    deps = _build_dependency_graph(requested, package_info_map)
                     if pkg_name in deps:
                         required_by.append(requested)
             
