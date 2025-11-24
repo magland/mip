@@ -2,9 +2,11 @@ function varargout = mip(command, varargin)
     % mip - MATLAB Interface for mip Package Manager
     %
     % Usage:
-    %   mip import <package>       - Import a package into MATLAB path
+    %   mip import <package>       - Import a package
+    %   mip unimport <package>     - Unimport a package
     %   mip install <package>      - Install a package
     %   mip uninstall <package>    - Uninstall a package
+    %   mip list-imported          - List currently imported packages
     %   mip list                   - List installed packages
     %   mip setup                  - Set up MATLAB integration
     %   mip find-name-collisions   - Find symbol name collisions
@@ -29,7 +31,24 @@ function varargout = mip(command, varargin)
         mip.import(packageName, varargin{2:end});
         return;
     end
-    
+
+    % Handle 'unimport' command by calling mip.unimport
+    if strcmp(command, 'unimport')
+        if nargin < 2
+            error('mip:noPackage', 'No package specified for unimport command.');
+        end
+        packageName = varargin{1};
+        % Call mip.unimport with the package name
+        mip.unimport(packageName);
+        return;
+    end
+
+    % Handle 'list-imported' command by calling mip.list_imported
+    if strcmp(command, 'list-imported')
+        mip.list_imported();
+        return;
+    end
+
     % For all other commands, forward to system call
     % Build the command string
     cmdStr = 'mip';

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Direct/indirect imports and listing imported packages
+
 ## [0.1.4] - 2025-11-24
 
 - Split commands.py into multiple files

@@ -10,8 +10,10 @@ function import(packageName, varargin)
     % Parse optional arguments for internal use
     p = inputParser;
     addParameter(p, 'importingStack', {}, @iscell);
+    addParameter(p, 'isDirect', true, @islogical);
     parse(p, varargin{:});
     importingStack = p.Results.importingStack;
+    isDirect = p.Results.isDirect;
     
     % Check for circular dependencies
     if ismember(packageName, importingStack)
@@ -49,7 +51,14 @@ function import(packageName, varargin)
     
     % Check if package is already imported
     if isPackageImported(packageName)
-        fprintf('Package "%s" is already imported\n', packageName);
+        % If this is a direct import and the package was previously
+        % imported as a dependency, mark it as direct now
+        if isDirect && ~isPackageDirectlyImported(packageName)
+            markPackageAsDirect(packageName);
+            fprintf('Package "%s" is already imported (now marked as direct)\n', packageName);
+        else
+            fprintf('Package "%s" is already imported\n', packageName);
+        end
         return;
     end
     
@@ -70,7 +79,7 @@ function import(packageName, varargin)
                 for i = 1:length(mipConfig.dependencies)
                     dep = mipConfig.dependencies{i};
                     if ~isPackageImported(dep)
-                        mip.import(dep, 'importingStack', importingStack);
+                        mip.import(dep, 'importingStack', importingStack, 'isDirect', false);
                     else
                         fprintf('  Dependency "%s" is already imported\n', dep);
                     end
@@ -104,7 +113,7 @@ function import(packageName, varargin)
     cd(originalDir);
     
     % Mark package as imported
-    markPackageAsImported(packageName);
+    markPackageAsImported(packageName, isDirect);
 end
 
 function imported = isPackageImported(packageName)
@@ -116,13 +125,41 @@ function imported = isPackageImported(packageName)
     imported = ismember(packageName, MIP_IMPORTED_PACKAGES);
 end
 
-function markPackageAsImported(packageName)
+function markPackageAsImported(packageName, isDirect)
     % Helper function to mark a package as imported
     global MIP_IMPORTED_PACKAGES;
+    global MIP_DIRECTLY_IMPORTED_PACKAGES;
+    
     if isempty(MIP_IMPORTED_PACKAGES)
         MIP_IMPORTED_PACKAGES = {};
     end
     if ~ismember(packageName, MIP_IMPORTED_PACKAGES)
         MIP_IMPORTED_PACKAGES{end+1} = packageName;
     end
+    
+    % Track directly imported packages separately
+    if isDirect
+        markPackageAsDirect(packageName);
+    end
+end
+
+function markPackageAsDirect(packageName)
+    % Helper function to mark a package as directly imported
+    global MIP_DIRECTLY_IMPORTED_PACKAGES;
+    
+    if isempty(MIP_DIRECTLY_IMPORTED_PACKAGES)
+        MIP_DIRECTLY_IMPORTED_PACKAGES = {};
+    end
+    if ~ismember(packageName, MIP_DIRECTLY_IMPORTED_PACKAGES)
+        MIP_DIRECTLY_IMPORTED_PACKAGES{end+1} = packageName;
+    end
+end
+
+function direct = isPackageDirectlyImported(packageName)
+    % Helper function to check if a package is directly imported
+    global MIP_DIRECTLY_IMPORTED_PACKAGES;
+    if isempty(MIP_DIRECTLY_IMPORTED_PACKAGES)
+        MIP_DIRECTLY_IMPORTED_PACKAGES = {};
+    end
+    direct = ismember(packageName, MIP_DIRECTLY_IMPORTED_PACKAGES);
 end
