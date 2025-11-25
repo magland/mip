@@ -2,11 +2,11 @@
 
 > **⚠️ Warning**: This project is at a very early stage of development and is subject to breaking changes.
 
-A simple pip-style package manager for MATLAB packages.
+A pip-style package manager for MATLAB packages.
 
-## Installation
+## Installation and Setup
 
-Install the package using pip:
+**Step 1**: Install the package using pip.
 
 ```bash
 pip install mip-package-manager
@@ -23,7 +23,7 @@ cd mip-client
 pip install -e .
 ```
 
-To set up the MATLAB integration, run:
+**Step 2**: Set up the MATLAB integration.
 
 ```bash
 mip setup
@@ -56,7 +56,13 @@ Either from the command line or from within MATLAB, run:
 mip install package_name
 ```
 
-Downloads and installs a package to `~/.mip/packages/package_name`.
+For example, to install the `chebfun` package:
+
+```bash
+mip install chebfun
+```
+
+This downloads and installs a package to `~/.mip/packages/package_name`.
 
 [Table of installable packages](https://mip-org.github.io/mip-core/packages.html)
 
@@ -69,6 +75,13 @@ After setting up the MATLAB path and installing packages, you can load them in M
 mip load package_name
 
 % Now you can use the package functions
+```
+
+For example:
+
+```matlab
+mip load chebfun
+% Now use chebfun functions
 ```
 
 ### List installed packages
@@ -98,23 +111,23 @@ Removes an installed package after confirmation. Also removes any packages that 
 
 ```bash
 # Install a package
-mip install surfacefun
+mip install chebfun
 
 # List installed packages
 mip list
 
 # Use in MATLAB
 matlab
->> mip load surfacefun
+>> mip load chebfun
 >> % Now use the toolbox functions
 
 # Uninstall
-mip uninstall surfacefun
+mip uninstall chebfun
 ```
 
 ## How to add new packages
 
-For now mip supports a very limited set of packages, which are built as part of this repository. To add a new package, you should submit a pull request to https://github.com/mip-org/mip-core.
+For now mip supports a [limited set of packages](https://mip-org.github.io/mip-core/packages.html). To add a new package, you can submit a pull request to https://github.com/mip-org/mip-core.
 
 ## Requirements
 
