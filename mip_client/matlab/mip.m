@@ -2,23 +2,23 @@ function varargout = mip(command, varargin)
     % mip - MATLAB Interface for mip Package Manager
     %
     % Usage:
-    %   mip import <package> [--pin]  - Import a package (optionally pin it)
-    %   mip unimport <package>        - Unimport a package
-    %   mip unimport --all            - Unimport all non-pinned packages
-    %   mip pin <package>             - Pin an imported package
-    %   mip unpin <package>           - Unpin a package
-    %   mip install <package>         - Install a package
-    %   mip uninstall <package>       - Uninstall a package
-    %   mip list-imported             - List currently imported packages
-    %   mip list                      - List installed packages
-    %   mip setup                     - Set up MATLAB integration
-    %   mip find-name-collisions      - Find symbol name collisions
+    %   mip load <package> [--pin]  - Load a package (optionally pin it)
+    %   mip unload <package>        - Unload a package
+    %   mip unload --all            - Unload all non-pinned packages
+    %   mip pin <package>           - Pin a loaded package
+    %   mip unpin <package>         - Unpin a package
+    %   mip install <package>       - Install a package
+    %   mip uninstall <package>     - Uninstall a package
+    %   mip list-loaded             - List currently loaded packages
+    %   mip list                    - List installed packages
+    %   mip setup                   - Set up MATLAB integration
+    %   mip find-name-collisions    - Find symbol name collisions
     %
     % Examples:
-    %   mip import mypackage
-    %   mip import mypackage --pin
+    %   mip load mypackage
+    %   mip load mypackage --pin
     %   mip pin mypackage
-    %   mip unimport --all
+    %   mip unload --all
     %   mip install mypackage
     %   mip uninstall mypackage
     %   mip list
@@ -26,30 +26,30 @@ function varargout = mip(command, varargin)
     if nargin < 1
         error('mip:noCommand', 'No command specified. Use "mip help" for usage information.');
     end
-    
-    % Handle 'import' command by calling mip.import
-    if strcmp(command, 'import')
+
+    % Handle 'load' command by calling mip.load
+    if strcmp(command, 'load')
         if nargin < 2
-            error('mip:noPackage', 'No package specified for import command.');
+            error('mip:noPackage', 'No package specified for load command.');
         end
         packageName = varargin{1};
-        % Call mip.import with the package name and any additional arguments
-        mip.import(packageName, varargin{2:end});
+        % Call mip.load with the package name and any additional arguments
+        mip.load(packageName, varargin{2:end});
         return;
     end
 
-    % Handle 'unimport' command by calling mip.unimport
-    if strcmp(command, 'unimport')
+    % Handle 'unload' command by calling mip.unload
+    if strcmp(command, 'unload')
         if nargin < 2
-            error('mip:noPackage', 'No package specified for unimport command.');
+            error('mip:noPackage', 'No package specified for unload command.');
         end
         % Check for --all flag
         if strcmp(varargin{1}, '--all')
-            mip.unimport('--all');
+            mip.unload('--all');
         else
             packageName = varargin{1};
-            % Call mip.unimport with the package name
-            mip.unimport(packageName);
+            % Call mip.unload with the package name
+            mip.unload(packageName);
         end
         return;
     end
@@ -74,9 +74,9 @@ function varargout = mip(command, varargin)
         return;
     end
 
-    % Handle 'list-imported' command by calling mip.list_imported
-    if strcmp(command, 'list-imported')
-        mip.list_imported();
+    % Handle 'list-loaded' command by calling mip.list_loaded
+    if strcmp(command, 'list-loaded')
+        mip.list_loaded();
         return;
     end
 

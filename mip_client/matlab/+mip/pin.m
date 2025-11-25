@@ -1,27 +1,27 @@
 function pin(packageName)
-    % pin - Pin an imported package to prevent it from being unimported by 'unimport --all'
+    % pin - Pin an loaded package to prevent it from being unloaded by 'unload --all'
     %
     % Usage:
     %   mip.pin('packageName')
     %
     % This function marks a package as pinned. Pinned packages will not be
-    % removed when using 'mip unimport --all'.
-    
-    global MIP_IMPORTED_PACKAGES;
+    % removed when using 'mip unload --all'.
+
+    global MIP_LOADED_PACKAGES;
     global MIP_PINNED_PACKAGES;
     
     % Initialize if empty
-    if isempty(MIP_IMPORTED_PACKAGES)
-        MIP_IMPORTED_PACKAGES = {};
+    if isempty(MIP_LOADED_PACKAGES)
+        MIP_LOADED_PACKAGES = {};
     end
     if isempty(MIP_PINNED_PACKAGES)
         MIP_PINNED_PACKAGES = {};
     end
     
-    % Check if package is imported
-    if ~ismember(packageName, MIP_IMPORTED_PACKAGES)
-        error('mip:packageNotImported', ...
-              'Package "%s" is not currently imported. Import it first with "mip import %s".', ...
+    % Check if package is loaded
+    if ~ismember(packageName, MIP_LOADED_PACKAGES)
+        error('mip:packageNotLoaded', ...
+              'Package "%s" is not currently loaded. Load it first with "mip load %s".', ...
               packageName, packageName);
     end
     

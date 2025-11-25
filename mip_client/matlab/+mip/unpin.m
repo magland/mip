@@ -1,12 +1,12 @@
 function unpin(packageName)
-    % unpin - Unpin a package to allow it to be unimported by 'unimport --all'
+    % unpin - Unpin a package to allow it to be unloaded by 'unload --all'
     %
     % Usage:
     %   mip.unpin('packageName')
     %
     % This function removes the pin from a package, allowing it to be
-    % unimported with 'mip unimport --all'.
-    
+    % unloaded with 'mip unload --all'.
+
     global MIP_PINNED_PACKAGES;
     
     % Initialize if empty
