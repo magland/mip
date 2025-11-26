@@ -39,11 +39,11 @@ Repository = "https://github.com/mip-org/mip"
 Issues = "https://github.com/mip-org/mip/issues"
 
 [project.scripts]
-mip = "mip_client.__main__:main"
+mip = "mip_package_manager.__main__:main"
 
 [tool.setuptools]
-packages = ["mip_client"]
+packages = ["mip_package_manager"]
 include-package-data = true
 
 [tool.setuptools.package-data]
-mip_client = ["matlab/+mip/*.m", "matlab/mip.m"]
+mip_package_manager = ["matlab/+mip/*.m", "matlab/mip.m"]

@@ -1,4 +1,4 @@
 include README.md
 include LICENSE
-recursive-include mip_client *.py *.m
+recursive-include mip_package_manager *.py *.m
 recursive-include scripts *.py *.m

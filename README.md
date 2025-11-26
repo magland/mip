@@ -1,4 +1,4 @@
-# mip-client
+# mip package manager
 
 > **⚠️ Warning**: This project is at a very early stage of development and is subject to breaking changes.
 
@@ -16,8 +16,8 @@ Or install from source:
 
 ```bash
 # First, clone the repository
-git clone https://github.com/mip-org/mip-client.git
-cd mip-client
+git clone https://github.com/mip-org/mip-package-manager.git
+cd mip-package-manager
 
 # Then, install the package
 pip install -e .
